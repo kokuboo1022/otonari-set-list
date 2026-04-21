@@ -18,8 +18,8 @@ export default function SongFormModal({ initial = {}, onSave, onClose }) {
   const [title, setTitle] = useState(initial.title || '');
   const [artist, setArtist] = useState(initial.artist || '');
   const [duration, setDuration] = useState(formatDuration(initial.durationSec));
-  const [key, setKey] = useState(initial.key || '');
-  const [bpm, setBpm] = useState(initial.bpm || '');
+  
+  const [tempo, setTempo] = useState(initial.tempo || '');
   const [notes, setNotes] = useState(initial.notes || '');
   const [tags, setTags] = useState(initial.tags || []);
   const [tagInput, setTagInput] = useState('');
@@ -48,8 +48,7 @@ export default function SongFormModal({ initial = {}, onSave, onClose }) {
       title: title.trim(),
       artist: artist.trim(),
       durationSec: parseDuration(duration),
-      key: key.trim(),
-      bpm: bpm ? parseInt(bpm) : null,
+      tempo: tempo || '',
       notes: notes.trim(),
       tags,
     });
