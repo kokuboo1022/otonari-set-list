@@ -42,15 +42,15 @@
   --font-ui: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ---- Grain texture overlay ---- */
+/* ---- Paper texture overlay ---- */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9998;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   background-size: 300px 300px;
 }
 
@@ -59,7 +59,7 @@ body::before {
 html, body, #root { min-height: 100%; }
 body {
   background: var(--bg);
-  background-image: radial-gradient(ellipse 90% 55% at 50% -8%, rgba(224, 64, 64, 0.04) 0%, transparent 60%);
+  background-image: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(45, 110, 80, 0.04) 0%, transparent 60%);
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 15px;
@@ -92,7 +92,7 @@ input, select, textarea { font: inherit; }
   left: 2rem;
   width: 2.5rem;
   height: 2px;
-  background: var(--primary);
+  background: var(--accent);
 }
 
 .navbar-logo {
@@ -189,7 +189,7 @@ input, select, textarea { font: inherit; }
 
 .btn--primary {
   background: var(--primary);
-  color: #fff;
+  color: #f8f4ec;
 }
 .btn--primary:hover:not(:disabled) {
   background: var(--primary-hover);
@@ -200,11 +200,11 @@ input, select, textarea { font: inherit; }
 .btn--danger {
   background: transparent;
   color: var(--danger);
-  border: 1px solid rgba(224, 64, 64, 0.25);
+  border: 1px solid rgba(176, 58, 46, 0.25);
 }
 .btn--danger:hover:not(:disabled) {
-  background: rgba(224, 64, 64, 0.08);
-  border-color: rgba(224, 64, 64, 0.5);
+  background: rgba(176, 58, 46, 0.07);
+  border-color: rgba(176, 58, 46, 0.5);
 }
 
 .btn--ghost {
@@ -251,15 +251,15 @@ input, select, textarea { font: inherit; }
   background: var(--tag-bg);
   color: var(--tag-text);
   font-size: 0.76rem;
-  border: 1px solid rgba(224, 64, 64, 0.1);
+  border: 1px solid rgba(45, 110, 80, 0.15);
   cursor: pointer;
   transition: all 0.15s;
 }
-.tag:hover { background: rgba(224, 64, 64, 0.14); }
+.tag:hover { background: rgba(45, 110, 80, 0.14); }
 .tag--active {
   background: var(--tag-active-bg);
   color: var(--tag-active-text);
-  border-color: rgba(224, 64, 64, 0.3);
+  border-color: rgba(45, 110, 80, 0.35);
 }
 .tag--clear {
   background: transparent;
@@ -323,8 +323,8 @@ input, select, textarea { font: inherit; }
 /* ---- Setlist Card ---- */
 .setlist-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-left: 2px solid var(--primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.2s;
@@ -342,7 +342,7 @@ input, select, textarea { font: inherit; }
 .setlist-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-card);
-  border-left-color: var(--accent);
+  border-left-color: var(--primary);
 }
 
 .setlist-card-link {
@@ -386,8 +386,9 @@ input, select, textarea { font: inherit; }
   font-family: var(--font-mono);
   font-size: 0.74rem;
   color: var(--text-muted);
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid var(--border);
   padding: 0.65rem 1.25rem;
+  background: var(--bg-card-hover);
 }
 .setlist-card-count { color: var(--accent); }
 .setlist-card-time { color: var(--text-muted); }
@@ -410,7 +411,7 @@ input, select, textarea { font: inherit; }
 }
 .song-item:first-child { border-top: 1px solid var(--border-light); }
 .song-item:hover {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--bg-card-hover);
   padding-left: 0.75rem;
   padding-right: 0.75rem;
   margin: 0 -0.75rem;
@@ -437,7 +438,7 @@ input, select, textarea { font: inherit; }
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(6, 4, 14, 0.88);
+  background: rgba(30, 20, 8, 0.55);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   display: flex;
@@ -455,7 +456,7 @@ input, select, textarea { font: inherit; }
 .modal {
   background: var(--bg-modal);
   border: 1px solid var(--border-mid);
-  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  border-top: 2px solid var(--accent);
   border-radius: var(--radius-lg);
   padding: 2rem;
   width: 100%;
@@ -627,10 +628,10 @@ input, select, textarea { font: inherit; }
   user-select: none;
   transition: background 0.12s;
 }
-.setlist-row:hover { background: rgba(255, 255, 255, 0.025); }
+.setlist-row:hover { background: var(--bg-card-hover); }
 .setlist-row--dragging {
-  background: var(--bg-card-hover);
-  border: 1px solid rgba(224, 64, 64, 0.3) !important;
+  background: var(--bg-card);
+  border: 1px solid rgba(45, 110, 80, 0.35) !important;
   border-radius: var(--radius);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
 }
@@ -697,7 +698,7 @@ input, select, textarea { font: inherit; }
   opacity: 0.3;
 }
 .setlist-row:hover .btn-remove { opacity: 0.7; }
-.btn-remove:hover { background: rgba(224, 64, 64, 0.1); color: var(--danger); opacity: 1 !important; }
+.btn-remove:hover { background: rgba(176, 58, 46, 0.08); color: var(--danger); opacity: 1 !important; }
 
 /* ---- Library Panel ---- */
 .library-toolbar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
@@ -710,11 +711,11 @@ input, select, textarea { font: inherit; }
   max-height: 60vh;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  scrollbar-color: rgba(80, 55, 20, 0.2) transparent;
 }
 .library-list::-webkit-scrollbar { width: 4px; }
 .library-list::-webkit-scrollbar-track { background: transparent; }
-.library-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
+.library-list::-webkit-scrollbar-thumb { background: rgba(80, 55, 20, 0.2); border-radius: 2px; }
 
 .library-row {
   display: flex;
@@ -726,8 +727,8 @@ input, select, textarea { font: inherit; }
   transition: all 0.12s;
 }
 .library-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border-light);
+  background: var(--bg-card-hover);
+  border-color: var(--border);
 }
 .library-row--added { opacity: 0.35; }
 .library-row-info { flex: 1; min-width: 0; }
