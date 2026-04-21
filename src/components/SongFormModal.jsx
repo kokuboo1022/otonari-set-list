@@ -18,7 +18,6 @@ export default function SongFormModal({ initial = {}, onSave, onClose }) {
   const [title, setTitle] = useState(initial.title || '');
   const [artist, setArtist] = useState(initial.artist || '');
   const [duration, setDuration] = useState(formatDuration(initial.durationSec));
-  
   const [tempo, setTempo] = useState(initial.tempo || '');
   const [notes, setNotes] = useState(initial.notes || '');
   const [tags, setTags] = useState(initial.tags || []);
@@ -90,24 +89,13 @@ export default function SongFormModal({ initial = {}, onSave, onClose }) {
               />
             </label>
             <label className="field">
-              <span className="field-label">キー</span>
-              <input
-                className="input"
-                value={key}
-                onChange={e => setKey(e.target.value)}
-                placeholder="D, G, Em..."
-              />
-            </label>
-            <label className="field">
-              <span className="field-label">BPM</span>
-              <input
-                className="input"
-                type="number"
-                value={bpm}
-                onChange={e => setBpm(e.target.value)}
-                placeholder="120"
-                min="1"
-              />
+              <span className="field-label">テンポ</span>
+              <select className="input" value={tempo} onChange={e => setTempo(e.target.value)}>
+                <option value="">未設定</option>
+                <option value="high">速い (High)</option>
+                <option value="middle">中 (Middle)</option>
+                <option value="low">遅い (Low)</option>
+              </select>
             </label>
           </div>
           <div className="field">
