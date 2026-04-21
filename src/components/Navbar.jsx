@@ -5,8 +5,8 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-logo">
-        <span className="navbar-logo-icon">🎵</span>
-        <span className="navbar-logo-text">Setlist Builder</span>
+        <span className="navbar-logo-primary">Setlist</span>
+        <span className="navbar-logo-sub">Builder</span>
       </Link>
       <div className="navbar-links">
         <Link to="/" className={`nav-link ${loc.pathname === '/' ? 'nav-link--active' : ''}`}>

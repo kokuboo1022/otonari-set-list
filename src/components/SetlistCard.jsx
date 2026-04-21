@@ -14,6 +14,7 @@ export default function SetlistCard({ setlist, songs, onDelete }) {
     .map(id => songs.find(s => s.id === id))
     .filter(Boolean);
   const totalSec = songList.reduce((sum, s) => sum + (s?.durationSec || 0), 0);
+  const count = (setlist.songIds || []).length;
 
   const displayDate = setlist.date
     ? new Date(setlist.date).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -27,14 +28,18 @@ export default function SetlistCard({ setlist, songs, onDelete }) {
           {displayDate && <span className="setlist-card-date">{displayDate}</span>}
         </div>
         {setlist.venue && <p className="setlist-card-venue">{setlist.venue}</p>}
-        <div className="setlist-card-meta">
-          <span>{(setlist.songIds || []).length}曲</span>
-          <span>合計 {formatTotal(totalSec)}</span>
-        </div>
       </Link>
-      <button className="btn btn--danger btn--sm setlist-card-delete" onClick={() => onDelete(setlist)}>
-        削除
-      </button>
+      <div className="setlist-card-meta">
+        <span className="setlist-card-count">{count} tracks</span>
+        <span className="setlist-card-time">{formatTotal(totalSec)}</span>
+        <span className="setlist-card-spacer" />
+        <button
+          className="btn btn--danger btn--sm setlist-card-delete"
+          onClick={() => onDelete(setlist)}
+        >
+          削除
+        </button>
+      </div>
     </div>
   );
 }
