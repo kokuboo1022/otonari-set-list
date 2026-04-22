@@ -25,6 +25,8 @@ export function useSongs() {
       tempo: data.tempo || '',
       tags: data.tags || [],
       notes: data.notes || '',
+      rank: data.rank || 0,
+      instruments: data.instruments || {},
       usageCount: 0,
       createdAt: serverTimestamp(),
     });

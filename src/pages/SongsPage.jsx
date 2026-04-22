@@ -1,7 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useSongs } from '../hooks/useSongs';
+import { useMembers } from '../hooks/useMembers';
 import SongFormModal from '../components/SongFormModal';
 import ConfirmModal from '../components/ConfirmModal';
+import MemberAvatar from '../components/MemberAvatar';
+import { instrumentEmoji } from '../constants';
 
 function formatDuration(sec) {
   if (!sec) return '--:--';
@@ -10,9 +13,11 @@ function formatDuration(sec) {
 
 export default function SongsPage() {
   const { songs, loading, addSong, updateSong, deleteSong } = useSongs();
+  const { members } = useMembers();
   const [formTarget, setFormTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedRank, setSelectedRank] = useState(null);
   const [sortBy, setSortBy] = useState('title');
   const [search, setSearch] = useState('');
 
@@ -36,7 +41,10 @@ export default function SongsPage() {
       );
     }
     if (selectedTags.length > 0) {
-      list = list.filter(s => selectedTags.every(t => s.tags?.includes(t)));
+      list = list.filter(s => selectedTags.some(t => s.tags?.includes(t)));
+    }
+    if (selectedRank !== null) {
+      list = list.filter(s => (s.rank || 0) === selectedRank);
     }
     return [...list].sort((a, b) => {
       if (sortBy === 'title') return a.title.localeCompare(b.title, 'ja');
@@ -45,7 +53,7 @@ export default function SongsPage() {
       if (sortBy === 'usage') return (b.usageCount || 0) - (a.usageCount || 0);
       return 0;
     });
-  }, [songs, search, selectedTags, sortBy]);
+  }, [songs, search, selectedTags, selectedRank, sortBy]);
 
   const handleSave = async data => {
     if (formTarget === 'new') {
@@ -99,6 +107,24 @@ export default function SongsPage() {
         </div>
       )}
 
+      <div className="rank-filter">
+        <span className="rank-filter-label">得意度</span>
+        {[0, 1, 2, 3, 4, 5].map(n => (
+          <button
+            key={n}
+            className={`rank-filter-btn ${selectedRank === n ? 'rank-filter-btn--active' : ''}`}
+            onClick={() => setSelectedRank(selectedRank === n ? null : n)}
+          >
+            {n === 0 ? '候補' : '★'.repeat(n)}
+          </button>
+        ))}
+        {selectedRank !== null && (
+          <button className="tag tag--clear" onClick={() => setSelectedRank(null)}>
+            × クリア
+          </button>
+        )}
+      </div>
+
       {loading ? (
         <div className="loading">読み込み中...</div>
       ) : filtered.length === 0 ? (
@@ -119,7 +145,14 @@ export default function SongsPage() {
           {filtered.map(song => (
             <div key={song.id} className="song-item">
               <div className="song-item-main">
-                <div className="song-item-title">{song.title}</div>
+                <div className="song-item-title">
+                  {song.title}
+                  {song.rank > 0 && (
+                    <span className="song-rank">
+                      {'★'.repeat(song.rank)}{'☆'.repeat(5 - song.rank)}
+                    </span>
+                  )}
+                </div>
                 {song.artist && <div className="song-item-artist">{song.artist}</div>}
                 <div className="song-item-meta">
                   <span>{formatDuration(song.durationSec)}</span>
@@ -134,6 +167,25 @@ export default function SongsPage() {
                   </div>
                 )}
                 {song.notes && <div className="song-item-notes">{song.notes}</div>}
+                {members.length > 0 && song.instruments && Object.keys(song.instruments).length > 0 && (
+                  <div className="member-cards">
+                    {members.map((m, i) => {
+                      const val = song.instruments[m.id];
+                      if (val === undefined) return null;
+                      const isOff = val === '降り番';
+                      const label = isOff ? '降り番' : (val || '');
+                      return (
+                        <div key={m.id} className={`member-card ${isOff ? 'member-card--off' : ''}`}>
+                          <MemberAvatar name={m.name} order={m.order ?? i} size={30} />
+                          <span className="member-card-name">{m.name}</span>
+                          <span className="member-card-instrument">
+                            {!isOff && label && <>{instrumentEmoji(label)} </>}{label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <div className="song-item-actions">
                 <button className="btn btn--ghost btn--sm" onClick={() => setFormTarget(song)}>
