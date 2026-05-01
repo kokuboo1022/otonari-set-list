@@ -20,7 +20,6 @@ export function useSongs() {
   const addSong = data =>
     addDoc(collection(db, 'songs'), {
       title: data.title,
-      officialName: data.officialName || '',
       nickname: data.nickname || '',
       artist: data.artist || '',
       durationSec: data.durationSec || 0,

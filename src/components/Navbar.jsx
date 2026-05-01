@@ -15,6 +15,9 @@ export default function Navbar() {
         <Link to="/songs" className={`nav-link ${loc.pathname === '/songs' ? 'nav-link--active' : ''}`}>
           曲ライブラリ
         </Link>
+        <Link to="/candidates" className={`nav-link ${loc.pathname === '/candidates' ? 'nav-link--active' : ''}`}>
+          候補曲
+        </Link>
         <Link to="/members" className={`nav-link ${loc.pathname === '/members' ? 'nav-link--active' : ''}`}>
           メンバー
         </Link>

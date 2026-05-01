@@ -20,7 +20,6 @@ function formatDuration(sec) {
 export default function SongFormModal({ initial = {}, onSave, onClose, existingTags = [] }) {
   const { members } = useMembers();
   const [title, setTitle] = useState(initial.title || '');
-  const [officialName, setOfficialName] = useState(initial.officialName || '');
   const [nickname, setNickname] = useState(initial.nickname || '');
   const [artist, setArtist] = useState(initial.artist || '');
   const [duration, setDuration] = useState(formatDuration(initial.durationSec));
@@ -130,7 +129,6 @@ export default function SongFormModal({ initial = {}, onSave, onClose, existingT
 
     onSave({
       title: title.trim(),
-      officialName: officialName.trim(),
       nickname: nickname.trim(),
       artist: artist.trim(),
       durationSec: parseDuration(duration),
@@ -155,18 +153,11 @@ export default function SongFormModal({ initial = {}, onSave, onClose, existingT
             <input className="input" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="例: The Bucks of Oranmore" required autoFocus />
           </label>
-          <div className="field-row">
-            <label className="field">
-              <span className="field-label">正式名称</span>
-              <input className="input" value={officialName} onChange={e => setOfficialName(e.target.value)}
-                placeholder="例: The Bucks of Oranmore" />
-            </label>
-            <label className="field">
-              <span className="field-label">通称・別名</span>
-              <input className="input" value={nickname} onChange={e => setNickname(e.target.value)}
-                placeholder="例: バックスオブオラン" />
-            </label>
-          </div>
+          <label className="field">
+            <span className="field-label">通称・別名</span>
+            <input className="input" value={nickname} onChange={e => setNickname(e.target.value)}
+              placeholder="例: バックスオブオラン" />
+          </label>
           <label className="field">
             <span className="field-label">アーティスト / トラッド</span>
             <input className="input" value={artist} onChange={e => setArtist(e.target.value)}
@@ -282,13 +273,23 @@ export default function SongFormModal({ initial = {}, onSave, onClose, existingT
 
           <div className="field">
             <span className="field-label">得意度</span>
-            <div className="star-input">
-              {[1, 2, 3, 4, 5].map(n => (
-                <button key={n} type="button"
-                  className={`star-btn ${n <= rank ? 'star-btn--on' : ''}`}
-                  onClick={() => setRank(n === rank ? 0 : n)}>★</button>
-              ))}
+            <div className="rank-select">
+              <button
+                type="button"
+                className={`rank-candidate-btn ${rank === 0 ? 'rank-candidate-btn--active' : ''}`}
+                onClick={() => setRank(0)}
+              >
+                候補曲
+              </button>
+              <div className={`star-input ${rank > 0 ? 'star-input--has-rank' : ''}`}>
+                {[1, 2, 3, 4, 5].map(n => (
+                  <button key={n} type="button"
+                    className={`star-btn ${n <= rank ? 'star-btn--on' : ''}`}
+                    onClick={() => setRank(n === rank ? 0 : n)}>★</button>
+                ))}
+              </div>
             </div>
+            <p className="field-hint">得意度未設定の曲は「候補曲リスト」に表示されます</p>
           </div>
 
           <label className="field">

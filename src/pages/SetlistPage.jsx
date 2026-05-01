@@ -68,6 +68,7 @@ export default function SetlistPage() {
   const [libSearch, setLibSearch] = useState('');
   const [libSortBy, setLibSortBy] = useState('title');
   const [copied, setCopied] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
 
   useEffect(() => {
     if (setlist?.songIds) setLocalSongIds(setlist.songIds);
@@ -197,7 +198,12 @@ export default function SetlistPage() {
 
       <div className="setlist-builder">
         <section className="builder-setlist">
-          <h2 className="section-title">セットリスト</h2>
+          <div className="panel-header panel-header--view">
+            <span className="panel-header-title">セットリスト</span>
+            {localSongIds.length > 0 && (
+              <span className="panel-header-count">{localSongIds.length}曲</span>
+            )}
+          </div>
           {localSongIds.length === 0 ? (
             <div className="empty-state empty-state--sm">
               <p>右の曲ライブラリから曲を追加してください</p>
@@ -220,7 +226,9 @@ export default function SetlistPage() {
         </section>
 
         <section className="builder-library">
-          <h2 className="section-title">曲ライブラリから追加</h2>
+          <div className="panel-header panel-header--edit">
+            <span className="panel-header-title">＋ 曲を追加</span>
+          </div>
           <div className="library-toolbar">
             <input
               className="input search-input"
@@ -240,20 +248,31 @@ export default function SetlistPage() {
           </div>
 
           {allTags.length > 0 && (
-            <div className="tag-filter">
-              {allTags.map(tag => (
-                <button
-                  key={tag}
-                  className={`tag ${selectedTags.includes(tag) ? 'tag--active' : ''}`}
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                </button>
-              ))}
-              {selectedTags.length > 0 && (
-                <button className="tag tag--clear" onClick={() => setSelectedTags([])}>
-                  × クリア
-                </button>
+            <div className="tag-accordion">
+              <button
+                className={`tag-accordion-toggle ${selectedTags.length > 0 ? 'tag-accordion-toggle--active' : ''}`}
+                onClick={() => setTagsOpen(v => !v)}
+              >
+                <span>タグで絞り込む{selectedTags.length > 0 ? ` (${selectedTags.length})` : ''}</span>
+                <span className="tag-accordion-arrow">{tagsOpen ? '▲' : '▼'}</span>
+              </button>
+              {tagsOpen && (
+                <div className="tag-filter">
+                  {allTags.map(tag => (
+                    <button
+                      key={tag}
+                      className={`tag ${selectedTags.includes(tag) ? 'tag--active' : ''}`}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                  {selectedTags.length > 0 && (
+                    <button className="tag tag--clear" onClick={() => setSelectedTags([])}>
+                      × クリア
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -278,11 +297,11 @@ export default function SetlistPage() {
                       </div>
                     </div>
                     <button
-                      className={`btn ${added ? 'btn--ghost' : 'btn--primary'} btn--sm`}
+                      className={`btn ${added ? 'btn--added' : 'btn--primary'} btn--sm`}
                       onClick={() => addSong(song.id)}
                       disabled={added}
                     >
-                      {added ? '追加済' : '+ 追加'}
+                      {added ? '✓ 追加済' : '+ 追加'}
                     </button>
                   </div>
                 );
