@@ -95,17 +95,23 @@ export default function CandidatesPage() {
             <div key={song.id} className="song-item">
               <div className="song-item-main">
                 <div className="song-item-title">
-                  {song.title}
-                  {song.nickname && <span className="song-item-nickname">（{song.nickname}）</span>}
-                </div>
-                {song.artist && <div className="song-item-artist">{song.artist}</div>}
-                <div className="song-item-meta">
-                  <span>{formatDuration(song.durationSec)}</span>
+                  <span className="song-title-text">
+                    {song.title}
+                    {song.nickname && <span className="song-item-nickname">（{song.nickname}）</span>}
+                  </span>
                   {song.tempo && (
-                    <span className="song-meta-tempo">
+                    <span className="song-genre-badge">
                       {{ jig: 'ジグ', polka: 'ポルカ', waltz: 'ワルツ', reel: 'リール', hornpipe: 'ホーンパイプ', slip_jig: 'スリップジグ', other: 'その他' }[song.tempo] ?? song.tempo}
                     </span>
                   )}
+                </div>
+                {song.artist && (
+                  <div className="song-item-row2">
+                    <span className="song-item-artist">{song.artist}</span>
+                  </div>
+                )}
+                <div className="song-item-meta">
+                  <span>{formatDuration(song.durationSec)}</span>
                 </div>
                 {song.tags?.length > 0 && (
                   <div className="song-item-tags">

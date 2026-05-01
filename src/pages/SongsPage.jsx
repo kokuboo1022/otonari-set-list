@@ -189,24 +189,26 @@ export default function SongsPage() {
             <div key={song.id} className="song-item">
               <div className="song-item-main">
                 <div className="song-item-title">
-                  <span>
+                  <span className="song-title-text">
                     {song.title}
                     {song.nickname && <span className="song-item-nickname">（{song.nickname}）</span>}
                   </span>
+                  {song.tempo && (
+                    <span className="song-genre-badge">
+                      {{ jig: 'ジグ', polka: 'ポルカ', waltz: 'ワルツ', reel: 'リール', hornpipe: 'ホーンパイプ', slip_jig: 'スリップジグ', other: 'その他' }[song.tempo] ?? song.tempo}
+                    </span>
+                  )}
+                </div>
+                <div className="song-item-row2">
+                  {song.artist && <span className="song-item-artist">{song.artist}</span>}
                   {song.rank > 0 && (
                     <span className="song-rank">
                       {'★'.repeat(song.rank)}{'☆'.repeat(5 - song.rank)}
                     </span>
                   )}
                 </div>
-                {song.artist && <div className="song-item-artist">{song.artist}</div>}
                 <div className="song-item-meta">
                   <span>{formatDuration(song.durationSec)}</span>
-                  {song.tempo && (
-                    <span className="song-meta-tempo">
-                      {{ jig: 'ジグ', polka: 'ポルカ', waltz: 'ワルツ', reel: 'リール', hornpipe: 'ホーンパイプ', slip_jig: 'スリップジグ', other: 'その他' }[song.tempo] ?? song.tempo}
-                    </span>
-                  )}
                   {(song.usageCount || 0) > 0 && (
                     <span className="song-meta-usage">採用：{song.usageCount}</span>
                   )}
