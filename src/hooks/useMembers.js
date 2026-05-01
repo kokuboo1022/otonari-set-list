@@ -22,6 +22,7 @@ export function useMembers() {
       name: data.name,
       instruments: data.instruments || [],
       mainInstrument: data.mainInstrument || '',
+      photoURL: data.photoURL || '',
       order: data.order ?? members.length,
     });
 

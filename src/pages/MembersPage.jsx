@@ -1,14 +1,34 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useMembers } from '../hooks/useMembers';
 import ConfirmModal from '../components/ConfirmModal';
 import MemberAvatar from '../components/MemberAvatar';
 import { INSTRUMENT_OPTIONS, instrumentEmoji } from '../constants';
+
+function resizeToBase64(file, maxSize = 240) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.src = url;
+  });
+}
 
 function MemberForm({ initial = {}, order = 0, onSave, onCancel }) {
   const [name, setName] = useState(initial.name || '');
   const [instruments, setInstruments] = useState(initial.instruments || []);
   const [mainInstrument, setMainInstrument] = useState(initial.mainInstrument || '');
   const [input, setInput] = useState('');
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(initial.photoURL || '');
+  const fileInputRef = useRef();
 
   const addInstrument = val => {
     if (val && !instruments.includes(val)) setInstruments(prev => [...prev, val]);
@@ -20,16 +40,27 @@ function MemberForm({ initial = {}, order = 0, onSave, onCancel }) {
   };
   const toggleMain = v => setMainInstrument(prev => prev === v ? '' : v);
 
+  const handlePhotoChange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSave({ name: name.trim(), instruments, mainInstrument });
+    onSave({ name: name.trim(), instruments, mainInstrument, photoFile, photoURL: photoPreview });
   };
 
   return (
     <form className="member-form" onSubmit={handleSubmit}>
       <div className="member-form-top">
-        <MemberAvatar name={name || '?'} order={order} size={48} />
+        <button type="button" className="avatar-upload-btn" onClick={() => fileInputRef.current.click()} title="写真を変更">
+          <MemberAvatar name={name || '?'} order={order} size={52} photoURL={photoPreview} />
+          <span className="avatar-upload-overlay">📷</span>
+        </button>
+        <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoChange} />
         <input
           className="input"
           value={name}
@@ -107,12 +138,14 @@ export default function MembersPage() {
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const handleAdd = async data => {
+  const handleAdd = async ({ photoFile, ...data }) => {
+    if (photoFile) data.photoURL = await resizeToBase64(photoFile);
     await addMember(data);
     setAdding(false);
   };
 
-  const handleEdit = async data => {
+  const handleEdit = async ({ photoFile, ...data }) => {
+    if (photoFile) data.photoURL = await resizeToBase64(photoFile);
     await updateMember(editTarget.id, data);
     setEditTarget(null);
   };
@@ -159,7 +192,7 @@ export default function MembersPage() {
               ) : (
                 <>
                   <div className="member-item-info">
-                    <MemberAvatar name={member.name} order={member.order ?? i} size={44} />
+                    <MemberAvatar name={member.name} order={member.order ?? i} size={44} photoURL={member.photoURL} />
                     <div>
                       <div className="member-item-name">{member.name}</div>
                       {member.instruments?.length > 0 && (

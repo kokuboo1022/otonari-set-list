@@ -18,6 +18,8 @@ export default function SongsPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedRank, setSelectedRank] = useState(null);
+  const [filterUrl, setFilterUrl] = useState(false);
+  const [filterFile, setFilterFile] = useState(false);
   const [sortBy, setSortBy] = useState('title');
   const [search, setSearch] = useState('');
 
@@ -37,7 +39,10 @@ export default function SongsPage() {
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
-        s => s.title?.toLowerCase().includes(q) || s.artist?.toLowerCase().includes(q)
+        s => s.title?.toLowerCase().includes(q)
+          || s.officialName?.toLowerCase().includes(q)
+          || s.nickname?.toLowerCase().includes(q)
+          || s.artist?.toLowerCase().includes(q)
       );
     }
     if (selectedTags.length > 0) {
@@ -46,6 +51,12 @@ export default function SongsPage() {
     if (selectedRank !== null) {
       list = list.filter(s => (s.rank || 0) === selectedRank);
     }
+    if (filterUrl) {
+      list = list.filter(s => !!s.referenceUrl);
+    }
+    if (filterFile) {
+      list = list.filter(s => !!s.referenceFileUrl);
+    }
     return [...list].sort((a, b) => {
       if (sortBy === 'title') return a.title.localeCompare(b.title, 'ja');
       if (sortBy === 'artist') return (a.artist || '').localeCompare(b.artist || '', 'ja');
@@ -53,7 +64,7 @@ export default function SongsPage() {
       if (sortBy === 'usage') return (b.usageCount || 0) - (a.usageCount || 0);
       return 0;
     });
-  }, [songs, search, selectedTags, selectedRank, sortBy]);
+  }, [songs, search, selectedTags, selectedRank, filterUrl, filterFile, sortBy]);
 
   const handleSave = async data => {
     if (formTarget === 'new') {
@@ -76,7 +87,7 @@ export default function SongsPage() {
       <div className="toolbar">
         <input
           className="input search-input"
-          placeholder="曲名・アーティストで検索..."
+          placeholder="曲名・正式名称・通称・アーティストで検索..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -125,6 +136,27 @@ export default function SongsPage() {
         )}
       </div>
 
+      <div className="ref-filter">
+        <span className="rank-filter-label">音源</span>
+        <button
+          className={`rank-filter-btn ${filterUrl ? 'rank-filter-btn--active' : ''}`}
+          onClick={() => setFilterUrl(v => !v)}
+        >
+          URL あり
+        </button>
+        <button
+          className={`rank-filter-btn ${filterFile ? 'rank-filter-btn--active' : ''}`}
+          onClick={() => setFilterFile(v => !v)}
+        >
+          ファイルあり
+        </button>
+        {(filterUrl || filterFile) && (
+          <button className="tag tag--clear" onClick={() => { setFilterUrl(false); setFilterFile(false); }}>
+            × クリア
+          </button>
+        )}
+      </div>
+
       {loading ? (
         <div className="loading">読み込み中...</div>
       ) : filtered.length === 0 ? (
@@ -153,12 +185,22 @@ export default function SongsPage() {
                     </span>
                   )}
                 </div>
+                {(song.officialName || song.nickname) && (
+                  <div className="song-item-aliases">
+                    {song.officialName && <span className="song-alias song-alias--official">{song.officialName}</span>}
+                    {song.nickname && <span className="song-alias song-alias--nickname">{song.nickname}</span>}
+                  </div>
+                )}
                 {song.artist && <div className="song-item-artist">{song.artist}</div>}
                 <div className="song-item-meta">
                   <span>{formatDuration(song.durationSec)}</span>
-                  {song.tempo && <span>{{ high: '速い', middle: '中', low: '遅い' }[song.tempo]}</span>}
+                  {song.tempo && (
+                    <span className="song-meta-tempo">
+                      {{ jig: 'ジグ', polka: 'ポルカ', waltz: 'ワルツ', reel: 'リール', hornpipe: 'ホーンパイプ', slip_jig: 'スリップジグ', other: 'その他' }[song.tempo] ?? song.tempo}
+                    </span>
+                  )}
                   {(song.usageCount || 0) > 0 && (
-                    <span className="song-meta-usage">{song.usageCount}回採用</span>
+                    <span className="song-meta-usage">採用：{song.usageCount}</span>
                   )}
                 </div>
                 {song.tags?.length > 0 && (
@@ -167,6 +209,32 @@ export default function SongsPage() {
                   </div>
                 )}
                 {song.notes && <div className="song-item-notes">{song.notes}</div>}
+                {(song.referenceUrl || song.referenceFileUrl) && (
+                  <div className="song-item-refs">
+                    {song.referenceUrl && (
+                      <a
+                        href={song.referenceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ref-badge"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        参考URL
+                      </a>
+                    )}
+                    {song.referenceFileUrl && (
+                      <a
+                        href={song.referenceFileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ref-badge ref-badge--file"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        {song.referenceFileName || '音源ファイル'}
+                      </a>
+                    )}
+                  </div>
+                )}
                 {members.length > 0 && song.instruments && Object.keys(song.instruments).length > 0 && (
                   <div className="member-cards">
                     {members.map((m, i) => {
@@ -176,7 +244,7 @@ export default function SongsPage() {
                       const label = isOff ? '降り番' : (val || '');
                       return (
                         <div key={m.id} className={`member-card ${isOff ? 'member-card--off' : ''}`}>
-                          <MemberAvatar name={m.name} order={m.order ?? i} size={30} />
+                          <MemberAvatar name={m.name} order={m.order ?? i} size={28} photoURL={m.photoURL} />
                           <span className="member-card-name">{m.name}</span>
                           <span className="member-card-instrument">
                             {!isOff && label && <>{instrumentEmoji(label)} </>}{label}
@@ -205,6 +273,7 @@ export default function SongsPage() {
           initial={formTarget === 'new' ? {} : formTarget}
           onSave={handleSave}
           onClose={() => setFormTarget(null)}
+          existingTags={allTags}
         />
       )}
 
